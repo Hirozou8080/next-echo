@@ -1,0 +1,53 @@
+version: '3'
+services:
+  go-backend:
+    build:
+      context: ./docker/go/
+      dockerfile: Dockerfile
+    ports:
+      - "${IP}:8080:8080"
+    volumes:
+      - ./app/backend:/app
+    expose:
+      - 9000
+    depends_on:
+      - go-db
+    container_name: go-backend
+
+  go-frontend:
+    build:
+      context: ./docker/node/
+      dockerfile: Dockerfile
+    volumes:
+      - ./app/frontend:/app
+    ports:
+      - "${IP}:3000:3000"
+    container_name: go-frontend
+
+  go-db:
+    image: mysql/mysql-server:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "${IP}:${MYSQL_PORT}:3306"
+    volumes:
+      - db-store_go:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/my.cnf
+    container_name: go-db
+
+  go-phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_HOST=go-db
+      - PMA_USER=${MYSQL_USER}
+      - PMA_PASSWORD=${MYSQL_PASSWORD}
+    ports:
+      - "${IP}:${PHPMYADMIN_PORT}:80"
+    depends_on:
+      - go-db
+    container_name: go-phpmyadmin
+volumes:
+  db-store_go:
