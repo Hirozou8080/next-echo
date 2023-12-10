@@ -1,4 +1,4 @@
 # ベースイメージを指定
-FROM node:16-alpine
+FROM node:latest
 # コンテナ内の作業ディレクトリを設定
 WORKDIR /app
