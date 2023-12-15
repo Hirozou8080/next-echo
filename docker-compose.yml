@@ -1,9 +1,8 @@
 services:
-  frontend:
+  next-frontend:
     build:
       context: .
       dockerfile: ./docker/node/Dockerfile
-    container_name: at-terrace-frontend
     volumes:
       - ./src/frontend:/app
       - /etc/passwd:/etc/passwd:ro
@@ -11,3 +10,63 @@ services:
     ports:
       - "${IP}:3000:3000"
     tty: true
+    container_name: next-frontend
+
+  go-backend:
+    build:
+      context: .
+      dockerfile: ./docker/go/Dockerfile
+    ports:
+      - "${IP}:1323:1323"
+    volumes:
+      - ./src/backend:/app
+    tty: true
+    container_name: go-backend
+
+  go-db:
+    build: ./docker/mysql
+    volumes:
+      - db-store_go:/var/lib/mysql
+    ports:
+      - "${IP}:3306:3306"
+    environment:
+      TZ: Asia/Tokyo
+    container_name: go-db
+
+  go-phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_HOST=go-db
+      - PMA_USER=hiro
+      - PMA_PASSWORD=pass
+    ports:
+      - "${IP}:4400:80"
+    depends_on:
+      - go-db
+    container_name: go-phpmyadmin
+
+  go-db_test:
+    build: ./docker/mysql-test
+    volumes:
+      - db-store_go_test:/var/lib/mysql
+    ports:
+      - "${IP}:3307:3306"
+    environment:
+      TZ: Asia/Tokyo
+    container_name: go-db_test
+
+  go-phpmyadmin_test:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_HOST=go-db_test
+      - PMA_USER=hiro
+      - PMA_PASSWORD=pass
+    ports:
+      - "${IP}:8889:80"
+    depends_on:
+      - go-db_test
+    container_name: go-phpmyadmin_test
+
+volumes:
+  db-store_go:
+  db-store_go_test:
