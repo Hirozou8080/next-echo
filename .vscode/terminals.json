@@ -1,0 +1,35 @@
+{
+  "autorun": true,
+  "terminals": [
+    {
+      "name": "フロントエンドホスト",
+      "description": "フロントエンドホスト",
+      "open": true,
+      "focus": true,
+      "command": "cd src/frontend"
+    },
+    {
+      "name": "フロントエンドコンテナ",
+      "description": "フロントエンドコンテナ",
+      "open": true,
+      "commands": [
+        "docker exec -it next-frontend bash",
+        "yarn install",
+        "yarn dev"
+      ]
+    },
+    {
+      "name": "バックエンドホスト",
+      "description": "バックエンドホスト",
+      "open": true,
+      "focus": true,
+      "command": "cd src/backend"
+    },
+    {
+      "name": "バックエンドコンテナ",
+      "description": "バックエンドコンテナ",
+      "open": true,
+      "commands": ["docker exec -it go-backend bash"]
+    }
+  ]
+}
